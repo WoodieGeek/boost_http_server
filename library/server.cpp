@@ -2,9 +2,9 @@
 
 #include <bits/stdc++.h>
 
-class session : public std::enable_shared_from_this<session> {
+class TSession : public std::enable_shared_from_this<TSession> {
 public:
-    session(boost::asio::ip::tcp::socket socket)
+    TSession(boost::asio::ip::tcp::socket socket)
         : socket_(std::move(socket)) {
     }
     void Start() {
@@ -57,7 +57,7 @@ void TServer::DoAccept() {
                 return;
             }
             if (!ec) {
-                std::make_shared<session>(std::move(Socket_))->Start();
+                std::make_shared<TSession>(std::move(Socket_))->Start();
             }
             DoAccept();
     });
