@@ -5,7 +5,7 @@
 class TSession : public std::enable_shared_from_this<TSession> {
 public:
     TSession(boost::asio::ip::tcp::socket socket)
-        : socket_(std::move(socket)) {
+        : Socket_(std::move(socket)) {
     }
     void Start() {
         DoRead();
@@ -13,7 +13,7 @@ public:
 private:
     void DoRead() {
         auto self(shared_from_this());
-        socket_.async_read_some(boost::asio::buffer(data_, 1024), [this, self](boost::system::error_code ec, std::size_t length) {
+        Socket_.async_read_some(boost::asio::buffer(Data_, 1024), [this, self](boost::system::error_code ec, std::size_t length) {
             if (!ec) {
                 DoWrite(length);
             }
@@ -24,16 +24,16 @@ private:
     void DoWrite(std::size_t) {
         auto self(shared_from_this());
         std::string msg = "HTTP/1.1 200 OK\r\n\r\nSOME TEXT";
-        boost::asio::async_write(socket_, boost::asio::buffer(msg), [this, self] (boost::system::error_code ec, std::size_t) {
+        boost::asio::async_write(Socket_, boost::asio::buffer(msg), [this, self] (boost::system::error_code ec, std::size_t) {
             if (!ec) {
-                socket_.close();
+                Socket_.close();
                 DoRead();
             }
         });
     }
 private:
-    boost::asio::ip::tcp::socket socket_;
-    char data_[1024];
+    boost::asio::ip::tcp::socket Socket_;
+    char Data_[1024];
 };
 
 TServer::TServer(const std::string& address, const std::string& port)
